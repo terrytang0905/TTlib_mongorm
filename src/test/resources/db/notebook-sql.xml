@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 分类 -->
+<sqls>
+	<!-- 分类 对象关系映射 -->
+	<mapping id="categoryInfo" class="com.lenovo.supernote.model.note.Category">
+		<property column="_id"  name="id"   value=""/>
+		<property column="name"  name="name"  value=""/>
+		<property column="numberOfNote"  name="numberOfNote"  value=""/>
+		<property column="categoryLogoID"  name="categoryLogoID"  value=""/>
+		<property column="belong" name="belong"  value=""/>
+		<property column="parentNode" name="parentNode"  value=""/>
+		<property column="lastUpdateTime" name="lastUpdateTime"  value=""/>
+		<property column="type" name="type"  value=""/>
+		<property column="deep" name="deep"  value=""/>
+		<property column="deletable" name="deletable"  value=""/>
+		<property column="version" name="version"  value="" type="long" />
+		<property column="status" name="status"  value="1" type="int" />
+		<property column="code" name="code"  value=""/>
+		<property column="defaultCode" name="defaultCode"  value=""/>
+		<property column="originalCreateTime" name="originalCreateTime"  value=""/>
+		<property column="createTime" name="createTime"  value=""/>
+		<property column="isEncrypted" name="isEncrypted"  value=""/>
+		<property column="accessPassword" name="accessPassword"  value=""/>
+		<property column="accessPasswordHint" name="accessPasswordHint"  value=""/>
+		<property column="genTime" name="genTime"  value=""/>
+		<property column="dataSource" name="dataSource" type="int"  value=""/>
+		<property column="dataSourceKey" name="belong"  value=""/>
+	</mapping>
+	
+	<!-- 分类 对象关系映射 (分享) -->
+	<mapping id="shareCategoryInfo" class="com.lenovo.supernote.model.note.Category">
+		<property column="name"  name="name"/>
+		<property column="numberOfNote" name="numberOfNote"/>
+		<property column="categoryLogoID" name="categoryLogoID"/>
+		<property column="type" name="type"/>
+		<property column="status" name="status"  value="1" type="int" />
+		<property column="originalCreateTime" name="originalCreateTime"/>
+		<property column="createTime" name="createTime"/>
+		<property column="isEncrypted" name="isEncrypted"/>
+		<property column="accessPassword" name="accessPassword"/>
+		<property column="accessPasswordHint" name="accessPasswordHint"/>
+	</mapping>
+	
+	<!-- 分类版本信息 -->
+	<mapping id="categoryVersionInfo" class="com.lenovo.supernote.model.syn.CategoryVersion">
+		<property column="_id"  name="categoryID"/>
+		<property column="version" name="categoryVersion"/>
+		<property column="defaultCode" name="defaultCode"/>
+	</mapping>
+	
+	<!-- 分类版本信息 -->
+	<mapping id="cateVersion" class="com.lenovo.supernote.model.syn.CateVersion">
+		<property column="_id"  name="categoryID"/>
+		<property column="version" name="categoryVersion"/>
+	</mapping>
+	
+	<!-- 添加用户分类 -->
+	<insert id="addUserCategory" collection="ln_category">
+		<property name="param" mapping="categoryInfo" />
+	</insert>
+	
+	<!-- 检索分类列表 -->
+	<select id="getCategoryList" collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="belong"    name="userID"  value="not exist" />
+			<value column="parentNode"    name="categoryID"  value="not exist" />
+			<value column="status" type="int"  value="1" />
+		</property>
+		<property name="result" mapping="categoryInfo"/>
+		<property name="order">
+				<value key="originalCreateTime"  value="-1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="1000"/>
+	</select>
+	
+	<!-- 根据分类ID 检索子分类列表 -->
+	<select id="getCategoryListByID" collection="ln_category">
+		<property name="param" class="java.lang.String">
+			<value column="parentNode" name="${value}" value="not exist"/>
+			<value column="status" type="int" value="1" />
+		</property>
+		<property name="result" mapping="categoryInfo"/>
+		<property name="order">
+				<value key="originalCreateTime"  value="-1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="1000"/>
+	</select>	
+	
+	
+	
+	<!-- 分类信息 -->
+	<select id="getCategory"  collection="ln_category">
+		<property name="param" class="java.lang.String">
+			<value column="_id" name="${value}" type="objectid"  value="not exist"/>
+		</property>
+		<property name="result" mapping="categoryInfo"/>
+	</select>
+	
+	<!-- 分类信息 -->
+	<select id="getCategoryBelong"  collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="_id" name="categoryID" type="objectid"  value="not exist"/>
+			<value column="belong" name="belong"  value="not exist"/>
+		</property>
+		<property name="result" mapping="categoryInfo"/>
+	</select>
+	
+	<!-- 分享分类信息 -->
+	<select id="getShareCategory"  collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="_id" name="categoryID" type="objectid"  value="not exist"/>
+		</property>
+		<property name="result" mapping="shareCategoryInfo"/>
+		<property name="order">
+				<value key="_id"  value="1"/>
+		</property>
+	</select>
+	
+	<!--检索分享子分类列表 -->
+	<select id="getShareCategoryListByID" collection="ln_category">
+		<property name="param" class="java.lang.String">
+			<value column="parentNode" name="${value}" value="not exist"/>
+			<value column="status" type="int" value="1" />
+		</property>
+		<property name="result" mapping="shareCategoryInfo"/>
+		<property name="order">
+				<value key="originalCreateTime"  value="-1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="1000"/>
+	</select>
+	
+	<!-- 分类版本 -->
+	<select id="getCategoryVersion"  collection="ln_category">
+		<property name="param" class="java.lang.String">
+			<value column="_id" name="${value}" value="not exist" type="objectid" />
+			<value column="status" type="int" value="1" />
+		</property>
+		<property name="result" class="java.lang.Long">
+			<value column="version"  value="1"/>
+		</property>
+		<property name="order">
+				<value key="version"  value="1"/>
+		</property>
+	</select>
+	
+	<!-- 检索缺省分类id -->
+	<select id="getDefaultCategory"  collection="ln_category">
+		<property name="param" class="java.lang.String">
+			<value column="belong" name="${value}" value="not exist"/>
+			<value column="defaultCode"  type="int"  value="1"/>
+		</property>
+		<property name="result" mapping="categoryInfo"/>
+		<property name="order">
+				<value key="_id"  value="1"/>
+		</property>
+	</select>
+	
+	<!-- 检索缺省分类id -->
+	<select id="getDefaultCategoryID"  collection="ln_category">
+		<property name="param" class="java.lang.String">
+			<value column="belong" name="${value}" value="not exist"/>
+			<value column="defaultCode"  type="int"  value="1"/>
+		</property>
+		<property name="result" class="java.lang.String">
+			<value column="_id"  value="1"/>
+		</property>
+	</select>
+	
+	<select id="getNoteIDList2Delete2RecycleForOpLog"  collection="ln_note">
+		<property name="param" class="java.util.Map">
+			<value column="belong" name="userID" value="-1"/>
+			<value column="categoryID" name="categoryList" operate="$in" />
+			<value column="status" type="int"  value="1" />
+		</property>
+		<property name="result" class="java.lang.String">
+			<value column="_id"  value="1"/>
+		</property>
+	</select>
+	
+	<update id="deleteNoteRecycleByNoteIDList" collection="ln_note">
+		<property name="param" class="java.util.Map">
+			<value column="belong" name="userID" value="-1"/>
+			<value column="_id" name="noteList" type="objectid" operate="$in" />
+			<value column="status" type="int"  value="1" />
+		</property>
+		<property name="action">
+			<value column="status"  operate="$set"  value="2" type="int" />
+			<value column="version" operate="$inc" value="1"  type="long" />
+			<value column="lastUpdateTime" operate="$set" name="lastUpdateTime"  type="long" />
+			<value column="categoryID" operate="$set" name="categoryID"  />
+		</property>
+	</update>
+	
+	<!-- 删除分类 update status=0 -->
+	<update id="deleteCategory2RecyleByIDList" collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="_id" type="objectid" name="categoryList" operate="$in" />
+			<value column="belong"    name="userID" />
+			<value column="status"    type="int"  value="1" />
+		</property>
+		<property name="action">
+			<value column="status"  operate="$set" value="0" type="int"  />
+			<value column="version"  operate="$inc" value="1" type="long"  />
+			<value column="lastUpdateTime" operate="$set" name="lastUpdateTime"  type="long" />
+		</property>
+	</update>
+	
+	<!-- 检索子分类id -->
+	<select id="getChildCategoryID" collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="belong"    name="userID"   value="not exist" />
+			<value column="parentNode"    name="categoryID"   value="not exist" />
+			<value column="status" type="int"  value="1" />
+		</property>
+		<property name="result"  class="java.lang.String">
+			<value column="_id"  value="1"/>
+		</property>
+		<property name="order">
+				<value key="originalCreateTime"  value="-1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="1000"/>
+	</select>
+	
+	<!-- 删除分类 -->
+	<delete id="delCategory" collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="_id" type="objectid" name="categoryID" value=""/>
+			<value column="belong"    name="userID"   value="" />
+			<value column="status"    type="int"  value="1" />
+		</property>
+	</delete>
+	
+	<!-- 更新分类 -->
+	<update id="editCategory" collection="ln_category">
+		<porperty name="param" class="java.util.Map">
+			<value column="_id" type="objectid"    name="id"   value="not exist" />
+			<value column="version"    name="clientVersion" type="long"  />
+			<value column="belong"    name="userID"   value="not exist" />
+			<value column="status"     type="int"  value="1" />
+		</porperty>
+		<property name="action">
+			<value column="parentNode"  name="parentCategoryID" operate="$set" />
+			<value column="categoryLogoID"  name="categoryLogoID" operate="$set" />
+			<value column="name"  name="name" operate="$set" />
+			<value column="version"  operate="$inc" value="1"  type="long" />
+			<value column="lastUpdateTime"  name="lastUpdateTime" operate="$set" />
+			<value column="type"  name="type" operate="$set" />
+			<value column="code"  name="code" operate="$set" />
+			<value column="createTime"  name="createTime" operate="$set" />
+			<value column="isEncrypted"  name="isEncrypted" operate="$set" />
+			<value column="accessPassword"  name="accessPassword" operate="$set" />
+			<value column="accessPasswordHint"  name="accessPasswordHint" operate="$set" />
+			<value column="status"  name="status" operate="$set" />
+		</property>
+	</update>
+	
+	<!-- 取根节点信息 -->
+	<select id="getRootCategory" collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="_id" type="objectid" name="rootID" value="not exist"/>
+			<value column="belong" name="userID" value="not exist" />
+			<value column="parentNode" value="-1"/>
+		</property>
+		<property name="result" mapping="categoryVersionInfo"/>
+	</select>
+	
+	<!-- 获取分类的版本信息 根据父节点 -->
+	<select id="getCategoryVersionByParentId" collection="ln_category">
+		<property name="param" class="java.lang.String">
+			<value column="parentNode" name="${value}" value="not exist"/>
+			<value column="status"    name="status"    type="int"  value="1" />
+		</property>
+		<property name="result" mapping="categoryVersionInfo"/>
+		<property name="order">
+			<value key="_id" value="-1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="999"/>
+	</select>
+	
+	<!-- 获得父分类id -->
+	<select id="getParentCategoryID"  collection="ln_category">
+		<property name="param" class="java.lang.String">
+			<value column="_id" type="objectid" name="${value}" value="not exist"/>
+		</property>
+		<property name="result" class="java.lang.String">
+			<value column="parentNode"  value="1"/>
+		</property>
+		<property name="order">
+				<value key="_id"  value="1"/>
+		</property>
+	</select>
+	
+	<!-- 取根节点信息 -->
+	<select id="getUserRootCategory" collection="ln_category">
+		<property name="param" class="java.lang.String">
+			<value column="belong" name="${value}" value="not exist"/>
+			<value column="parentNode" value="-1"/>
+		</property>
+		<property name="result" class="java.lang.String">
+			<value column="_id"  value="1"/>
+		</property>
+	</select>
+	
+	<update id="increaseCategoryVersionByIDList" collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="_id" type="objectid" name="categoryList" operate="$in" />
+			<value column="status"    type="int"  value="1" />
+		</property>
+		<property name="action">
+			<!-- <value column="version" operate="$inc"  value="1" type="long" /> --><!-- 取消版本回溯 -->
+			<value column="numberOfNote" operate="$inc" name="dispersion" type="int" />
+		</property>
+	</update>	
+	
+	<!-- 检索用户所有分类 -->
+	<select id="getAllCategorybyUserID" collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="belong"    name="userID"  value="not exist" />
+			<value column="status"    type="int"  value="1" />
+		</property>
+		<property name="result" mapping="categoryInfo"/>
+		<property name="order">
+				<value key="originalCreateTime"  value="-1"/>
+		</property>
+	</select>
+	
+	<!-- 根据code检索子孙分类id -->
+	<select id="getChildrenCategoryIDByCode" collection="ln_category">
+		<property name="param" class="java.lang.String">
+			<value column="code"    name="${value}" type="regex"  value="not exist"/>
+			<value column="status"  type="int"  value="1" />
+		</property>
+		<property name="result" mapping="categoryInfo"/>
+		<property name="order">
+				<value key="_id"  value="1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="1000"/>
+	</select>
+	
+	<!-- 根据code检索子孙分类id -->
+	<select id="getChildrenCategoryIDByCodeList" collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="code"    name="regList" type="regex" operate="$in" value="not exist"/>
+			<value column="status"  type="int"  value="1" />
+		</property>
+		<property name="result" mapping="categoryInfo"/>
+		<property name="order">
+				<value key="_id"  value="1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="1000"/>
+	</select>
+	
+	<!-- 取根节点信息 -->
+	<select id="getRootCategoryInfo" collection="ln_category">
+		<property name="param" class="java.lang.String">
+			<value column="belong" name="${value}" value="not exist" />
+			<value column="parentNode" value="-1"/>
+		</property>
+		<property name="result" mapping="categoryInfo"/>
+	</select>	
+	
+	<!-- 获取指定id分类列表 -->
+	<select id="getCateListByIDList" collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="_id" type="objectid" name="cateIDs" operate="$in" />
+		</property>
+		<property name="result" mapping="categoryInfo"/>
+		<property name="order">
+			<value key="_id" value="-1"/>
+		</property>
+	</select>
+	
+	<!-- 根据分类id列表,检索其所有成员的版本信息 -->
+	<select id="getCateVersionByIDList" collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="_id" type="objectid" name="cateIDs" operate="$in" />
+		</property>
+		<property name="result" mapping="cateVersion"/>
+	</select>
+	
+	<update id="updateCategoryCode" collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="_id" type="objectid" name="cateID" value="-1"/>
+		</property>
+		<property name="action">
+			<value column="code"  operate="$set" name="code" value="" />
+		</property>
+	</update>
+	
+	<update id="updateCategoryNumberOfNote" collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="_id" type="objectid" name="categoryID" value="-1"/>
+		</property>
+		<property name="action">
+			<value column="numberOfNote"  operate="$set" name="numberOfNote" type="int" value="" />
+		</property>
+	</update>
+</sqls>

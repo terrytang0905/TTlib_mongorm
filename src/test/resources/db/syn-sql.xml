@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 同步 -->
+<sqls>
+	<mapping id="synCateInfo" class="com.lenovo.supernote.model.syn.SynData$SynCate">
+		<property column="_id"  name="id"   value=""/>
+		<property column="name"  name="name"  value=""/>
+		<property column="categoryLogoID"  name="categoryLogoID"  value=""/>
+		<property column="parentNode" name="parentCategoryID"  value=""/>
+		<property column="deletable" name="deletable"  value=""/>
+		<property column="version" name="version"  value="" type="long" />
+		<property column="status" name="status"  value="1" type="int" />
+		<property column="originalCreateTime" name="originalCreateTime"  value=""/>
+		<property column="createTime" name="createTime"  value=""/>
+		<property column="isEncrypted" name="isEncrypted"  value=""/>
+		<property column="accessPassword" name="accessPassword"  value=""/>
+		<property column="accessPasswordHint" name="accessPasswordHint"  value=""/>
+		<property column="lastUpdateTime" name="lastUpdateTime"  value=""/>
+	</mapping>
+	
+	<mapping id="synCreateTag" class="com.lenovo.supernote.model.syn.TimestampSynData$CreateTag">
+		<property column="_id"  name="tagID"/>
+		<property column="name" name="tagName"/>
+		<property column="type" name="tagType"/>
+		<property column="tagIcon" name="tagIcon"/>
+	</mapping>
+	
+	<mapping id="synDeleteCate" class="com.lenovo.supernote.model.syn.TimestampSynData$DelCate">
+		<property column="_id"  name="categoryID"/>
+		<property column="version" name="categoryVersion"/>
+	</mapping>
+	
+	<mapping id="synDeleteNote" class="com.lenovo.supernote.model.syn.TimestampSynData$DelNote">
+		<property column="_id"  name="noteID"/>
+		<property column="version" name="noteVersion"/>
+	</mapping>
+	
+	<mapping id="synDefaultCate" class="com.lenovo.supernote.model.syn.TimestampSynData$DefaultCate">
+		<property column="_id"  name="categoryID"/>
+		<property column="defaultCode" name="categoryCode"/>
+		<property column="version" name="categoryVersion"/>
+	</mapping>
+	
+	<mapping id="synDefaultNote" class="com.lenovo.supernote.model.syn.TimestampSynData$DefaultNote">
+		<property column="_id"  name="noteID"/>
+		<property column="defaultCode" name="noteCode"/>
+		<property column="version" name="noteVersion"/>
+	</mapping>
+	
+	<select id="getSynCreateTagList" collection="ln_tag">
+		<property name="param" class="java.util.Map">
+			<value column="_id" type="objectid" name="tagIDs" operate="$in" />
+		</property>
+		<property name="result" mapping="synCreateTag"/>
+		<property name="order">
+			<value key="_id" value="-1"/>
+		</property>
+	</select>
+	
+	<select id="getSynAllTagList" collection="ln_tag">
+		<property name="param" class="java.util.Map">
+			<value column="creator" name="userID" value="not exist"/>
+			<value column="createTime" name="createTime" operate="$lte" />
+		</property>
+		<property name="result"   mapping="synCreateTag" />
+	</select>
+	
+	<select id="getSynCateList" collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="_id" type="objectid" name="cateIDs" operate="$in" />
+			<value column="belong" name="userID" value="not exist" />
+			<value column="status" value="1" type="int" />
+			<value column="defaultCode" type="null" />
+		</property>
+		<property name="result" mapping="synCateInfo"/>
+		<property name="order">
+			<value key="_id" value="-1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="0"/>
+	</select>
+	
+	<select id="getSynAllCateList" collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="belong" name="userID" value="not exist" />
+			<value column="status" value="1" type="int" />
+			<value column="genTime" name="createTime" operate="$lte" />
+			<value column="defaultCode" type="null" />
+			<value column="_id" name="notInIDs" operate="$nin" type="objectid"  />
+		</property>
+		<property name="result" mapping="synCateInfo"/>
+		<property name="order">
+			<value key="_id" value="-1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="0"/>
+	</select>
+	
+	<select id="getSynAllCateListUpdate" collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="belong" name="userID" value="not exist" />
+			<value column="status" value="1" type="int" />
+			<value column="genTime" name="createTime" operate="$lte" />
+			<value column="defaultCode" type="null" />
+			<value column="_id" name="InIDs" operate="$in" type="objectid"  />
+		</property>
+		<property name="result" mapping="synCateInfo"/>
+		<property name="order">
+			<value key="_id" value="-1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="0"/>
+	</select>
+	
+	<select id="getSynDeleteCateList" collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="_id" type="objectid" name="cateIDs" operate="$in" />
+			<value column="belong" name="userID" value="not exist" />
+			<value column="status" value="0" type="int" />
+			<value column="defaultCode" type="null" />
+		</property>
+		<property name="result" mapping="synDeleteCate"/>
+		<property name="order">
+			<value key="_id" value="-1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="0"/>
+	</select>
+	
+	<select id="getSynDeleteNoteList" collection="ln_note">
+		<property name="param" class="java.util.Map">
+			<value column="_id" type="objectid" name="noteIDs" operate="$in" />
+			<value column="belong" name="userID" value="not exist" />
+			<value column="status" value="3" type="int" />
+			<value column="defaultCode" type="null" />
+		</property>
+		<property name="result" mapping="synDeleteNote"/>
+		<property name="order">
+			<value key="_id" value="-1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="0"/>
+	</select>
+	
+	<select id="getDefaultNoteList" collection="ln_note">
+		<property name="param" class="java.util.Map">
+			<value column="belong" name="belong" value="not exist" />
+			<value column="defaultCode" name="defaultCodeList" operate="$in" type="int"  />
+		</property>
+		<property name="result" mapping="synDefaultNote"/>
+		<property name="order">
+			<value key="_id" value="-1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="0"/>
+	</select>
+	
+	<select id="getDefaultCateList" collection="ln_category">
+		<property name="param" class="java.util.Map">
+			<value column="belong" name="belong" value="not exist" />
+			<value column="defaultCode" name="defaultCodeList" operate="$in" type="int"  />
+		</property>
+		<property name="result" mapping="synDefaultCate"/>
+		<property name="order">
+			<value key="_id" value="-1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="0"/>
+	</select>	
+	
+	<!-- 全下发-检索所有笔记 -->
+	<select id="getSynAllNote" collection="ln_note">
+		<property name="param" class="java.util.Map">
+			<value column="belong" name="userID"/>
+			<value column="genTime" name="createTime" operate="$lte" />
+			<value column="status" type="dynamic" operate="$in">
+				<dynamic>
+					<list type="int">0,1,2</list>
+				</dynamic> 
+			</value>
+			<value column="_id" name="notInIDs" operate="$nin" type="objectid"  />
+		</property>
+		<property name="result"  mapping="noteMap"/>
+		<property name="order">
+			 <value key="originalCreateTime" value="-1"/>
+		</property>
+	</select>
+	
+	<!-- 全下发-检索所有笔记 -->
+	<select id="getSynAllNoteUpdate" collection="ln_note">
+		<property name="param" class="java.util.Map">
+			<value column="belong" name="userID"/>
+			<value column="genTime" name="createTime" operate="$lte" />
+			<value column="status" type="dynamic" operate="$in">
+				<dynamic>
+					<list type="int">0,1,2</list>
+				</dynamic> 
+			</value>
+			<value column="_id" name="InIDs" operate="$in" type="objectid"  />
+		</property>
+		<property name="result"  mapping="noteMap"/>
+		<property name="order">
+			 <value key="originalCreateTime" value="-1"/>
+		</property>
+	</select>
+</sqls>

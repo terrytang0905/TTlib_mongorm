@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 日志 -->
+<sqls>
+	<mapping id="opLogInfo" class="com.lenovo.supernote.model.OpLog">
+		<property column="_id"  name="id"/>
+		<property column="type" name="type" type="int" />
+		<property column="dataID" name="dataID"/>
+		<property column="operator" name="operator"/>
+		<property column="operateTime" name="operateTime" type="long" />
+		<property column="collectData" name="collectData"/>
+		<property column="deviceID" name="deviceID"/>
+		<property column="seq" name="seq" type="long"/>
+		<property column="sysTime" name="sysTime" type="long"/>
+	</mapping>
+	<mapping id="opLogCounter" class="com.lenovo.supernote.model.OpLogCounter">
+		<property column="_id"  name="id"/>
+		<property column="userID" name="userID" />
+		<property column="userType" name="userType" type="int"/>
+		<property column="counter" name="counter" type="int" />
+		<property column="maxseq" name="maxseq"/>
+		<property column="table" name="table"/>
+		<property column="lastUpdateTime" name="lastUpdateTime" type="long"/>
+		<property column="lastCleanTime" name="lastCleanTime"/>
+		<property column="canBeCleaned" name="canBeCleaned"/>
+	</mapping>
+	<mapping id="opLogTable" class="com.lenovo.supernote.service.monitor.OpLogTableMonitor$OpLogTable">
+		<property column="_id"  name="id"/>
+		<property column="name" name="name"/>
+		<property column="createTime" name="createTime" type="long"/>
+		<property column="activeLimit" name="activeLimit" type="long"/>
+		<property column="isActive" name="isActive" type="boolean"/>
+	</mapping>
+	
+	<select id="getOpLogList" collection="ln_oplog">
+		<property name="param" class="java.util.Map">
+			<value column="operateTime" name="timeStamp" type="long" value="0" operate="$gt"  />
+			<value column="operator" name="userID" value="not exist" />
+		</property>
+		<property name="result" mapping="opLogInfo"/>
+		<property name="order">
+			<value key="operateTime" value="1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="0"/>
+	</select>
+	
+	<select id="isSynAll" collection="ln_oplog">
+		<property name="param" class="java.util.Map">
+			<value column="operateTime" name="timeStamp" type="long" operate="$lte"  />
+			<value column="operator" name="userID" value="not exist" />
+		</property>
+		<property name="result" class="java.lang.String">
+			<value column="_id"  value="1"/>
+		</property>
+	</select>
+	
+	<select id="getConcurentOpLogList" collection="ln_oplog">
+		<property name="param" class="java.util.Map">
+			<value column="operateTime" name="timeStamp" type="long" value="-1" />
+			<value column="operator" name="userID" value="not exist" />
+			<value column="deviceID" name="deviceID"  operate="$ne" />
+		</property>
+		<property name="result" mapping="opLogInfo"/>
+	</select>
+	
+	<insert id="addOpLog" collection="ln_oplog">
+		<property name="param"  mapping="opLogInfo" />
+	</insert>
+	
+	<!-- 更新用户操作日志计数表 -->
+	<update id="increaseUserOplogCounter" collection="ln_oplog_counter">
+		<porperty name="param" class="java.util.Map">
+			<value column="userID"    name="userID" value="not exist" />
+		</porperty>
+		<property name="action">
+			<value column="lastUpdateTime" name="lastUpdateTime" operate="$set" type="long" />
+			<value column="counter"  operate="$inc"  value="1" type="int" />
+			<value column="maxseq"  operate="$inc"  value="1" type="long" />
+		</property>
+	</update>
+	
+	<!-- 更新用户操作日志表seq -->
+	<update id="updateUserOplogSeq" collection="ln_oplog">
+		<porperty name="param" class="java.util.Map">
+			<value column="_id" name="id" type="objectid" value="not exist" />
+		</porperty>
+		<property name="action">
+			<value column="seq"  operate="$set" name="seq" type="long" />
+		</property>
+	</update>
+	
+	<!-- 检索用户日志计数器 -->
+	<select id="getOpLogCounter" collection="ln_oplog_counter">
+		<property name="param" class="java.lang.String">
+			<value column="userID" name="${value}" value="not exist" />
+		</property>
+		<property name="result" mapping="opLogCounter"/>
+	</select>
+	
+	<!-- 查询当前可用oplog表 -->
+	<select id="getCurrentOpLogTable" collection="ln_oplog_table">
+		<property name="param" class="java.util.Map">
+			<value column="isActive" type="boolean" value="true" />
+		</property>
+		<property name="result" mapping="opLogTable"/>
+		<property name="order">
+			<value key="_id" value="-1"/>
+		</property>
+	</select>
+	<!-- 新增可用的oplog表 -->
+	<insert id="addCurrentOpLogTable" collection="ln_oplog_table">
+		<property name="param"  mapping="opLogTable"/>
+	</insert>
+	<!-- 更新当前oplog表 isActive字段 -->
+	<update id="updateCurrentOpLogTable" collection="ln_oplog_table">
+		<property name="param" class="java.util.Map">
+			<value column="_id"  name="id" type="objectid"/>
+			<value column="isActive" type="boolean" value="true"/>
+		</property>
+		<property name="action">
+			<value column="isActive" operate="$set" type="boolean" value="false"/>
+		</property>
+	</update>
+	
+	<!-- 新增用户操作日志计数表 -->
+	<insert id="addUserOptCounter" collection="ln_oplog_counter">
+		<property name="param"  mapping="opLogCounter"/>
+	</insert>
+	
+	<!-- 更新当前oplog表 是否可被清理 -->
+	<update id="updateOpLogCounterCleanStatus" collection="ln_oplog_counter">
+		<property name="param" class="java.util.Map">
+			<value column="_id"  name="id" type="objectid"/>
+			<value column="userID"  name="userID"/>
+		</property>
+		<property name="action">
+			<value column="canBeCleaned" operate="$set" name="canBeCleaned" type="boolean" value="false"/>
+		</property>
+	</update>
+	
+	<!-- 更新当前oplog表 是否可被清理 -->
+	<update id="updateOpLogAfterImported" collection="ln_oplog">
+		<property name="param" class="java.util.Map">
+			<value column="operator"  name="operator"/>
+			<value column="collectData"  name="device" type="regex"/>
+			<value column="seq"  type="null" />
+			<value column="sysTime"  type="null" />
+		</property>
+		<property name="action">
+			<value column="seq" operate="$set" name="seq" type="long" />
+			<value column="sysTime" operate="$set" name="sysTime" type="long" />
+			<value column="operateTime" operate="$set" name="operateTime" type="long" />
+		</property>
+	</update>
+	
+</sqls>

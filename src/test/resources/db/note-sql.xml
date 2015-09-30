@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqls>
+	<!-- 笔记 对象关系映射 -->
+	<mapping id="noteMap" class="com.lenovo.supernote.model.note.Note">
+		<property column="_id"  name="id"   value=""/>
+		<property column="title"  name="title"  value=""/>
+		<property column="type"  name="type"  value=""/>
+		<property column="belong"  name="belong"  value=""/>
+		<property column="isMarked"  name="isMarked"  value=""/>
+		<property column="lastUpdateTime"  name="lastUpdateTime"  value=""/>
+		<property column="weather"  name="weather" value="{}">
+			<value class="com.lenovo.supernote.model.note.Weather">
+				<property column="status"    name="status" />
+				<property column="temperature"    name="temperature" />
+			</value>
+		</property>
+		<property column="spot"  name="spot"  value="">
+			<value class="com.lenovo.supernote.model.note.Spot">
+				<property column="x"    name="x" />
+				<property column="y"    name="y" />
+				<property column="city"    name="city" />
+				<property column="address"    name="address" />
+			</value>
+		</property>
+		<property column="version" name="version"  value=""/>
+		<property column="status" name="status"  value=""/>
+		<property column="categoryID" name="categoryID"  value=""/>
+		<property column="content" name="content"  value=""/>
+		<property column="contentFormatTemplate" name="contentFormatTemplate"  value=""/>
+		<property column="remind" name="remind">
+			<value class="com.lenovo.supernote.model.note.Remind">
+				<property column="time" name="time"/>
+				<property column="period" name="period"/>
+			</value>
+		</property>
+		<property column="mood" name="mood"  value=""/>
+		<property column="originalCreateTime" name="originalCreateTime"  value=""/>
+		<property column="createTime" name="createTime"  value=""/>
+		<property column="backgroundID" name="backgroundID"  value=""/>
+		<property column="accessPassword" name="accessPassword"  value=""/>
+		<property column="accessPasswordHint" name="accessPasswordHint"  value=""/>
+		<property column="isEncrypt" name="isEncrypt"  value=""/>
+		<property column="includeType" name="includeType" type="int" value=""/>
+		<property column="summary" name="summary"  value=""/>
+		<property column="genTime" name="genTime"  value=""/>
+		<property column="styleType" name="styleType" type="int" value=""/>
+		<property column="dataSource" name="dataSource" type="int" value=""/>
+		<property column="dataSourceKey" name="belong"  value=""/>
+	</mapping>
+	
+	<!-- 笔记 对象关系映射 (分享) -->
+	<mapping id="shareNoteInfo" class="com.lenovo.supernote.model.note.Note">
+		<property column="title"  name="title"/>
+		<property column="type"  name="type"/>
+		<property column="isMarked"  name="isMarked"/>
+		<property column="lastUpdateTime"  name="lastUpdateTime"/>
+		<property column="weather"  name="weather">
+			<value class="com.lenovo.supernote.model.note.Weather">
+				<property column="status"    name="status"/>
+				<property column="temperature"    name="temperature" />
+			</value>
+		</property>
+		<property column="spot"  name="spot">
+			<value class="com.lenovo.supernote.model.note.Spot">
+				<property column="x"    name="x" />
+				<property column="y"    name="y" />
+				<property column="city"    name="city" />
+				<property column="address"    name="address" />
+			</value>
+		</property>
+		<property column="content" name="content"/>
+		<property column="contentFormatTemplate" name="contentFormatTemplate"/>
+		<property column="remind" name="remind">
+			<value class="com.lenovo.supernote.model.note.Remind">
+				<property column="time" name="time"/>
+				<property column="period" name="period"/>
+			</value>
+		</property>
+		<property column="mood" name="mood"  value=""/>
+		<property column="originalCreateTime" name="originalCreateTime"/>
+		<property column="createTime" name="createTime"/>
+		<property column="backgroundID" name="backgroundID"/>
+		<property column="includeType" name="includeType"/>
+		<property column="summary" name="summary"/>
+		<property column="genTime" name="genTime"/>
+	</mapping>
+	
+	<!-- 笔记分类版本信息 -->
+	<mapping id="noteVersionInfo" class="com.lenovo.supernote.model.syn.VersionInfo">
+		<property column="_id"  name="id"/>
+		<property column="version" name="version"/>
+	</mapping>
+	
+	<!-- 检索笔记列表 -->
+	<select id="getNoteList" collection="ln_note">
+		<property name="param" class="java.util.Map">
+			<value column="belong" name="userID"  value=""/>
+			<value column="categoryID" name="categoryID"  value=""/>
+			<value column="status" type="dynamic" operate="$in">
+				<dynamic>
+					<list type="int">0,1</list>
+				</dynamic> 
+			</value>
+		</property>
+		<property name="result"  mapping="noteMap"/>
+		<property name="order">
+			 <value key="lastUpdateTime"  value="-1"/>
+		</property>
+	</select>
+	
+	<!-- 根据分类列表检索笔记列表 -->
+	<select id="getNoteListByCategoryIDList" collection="ln_note">
+		<property name="param" class="java.lang.String">
+			<value column="categoryID" name="${value}" operate="$in"/>
+			<value column="status" type="dynamic" operate="$in">
+				<dynamic>
+					<list type="int">0,1</list>
+				</dynamic> 
+			</value>
+		</property>
+		<property name="result"  mapping="noteMap"/>
+		<property name="order">
+			 <value key="lastUpdateTime"  value="-1"/>
+		</property>
+	</select>
+	
+	<!-- 检索所有笔记 -->
+	<select id="getAllNote" collection="ln_note">
+		<property name="param" class="java.util.Map">
+				<value column="belong" name="userID"/>
+				<value column="status" type="dynamic" operate="$in">
+					<dynamic>
+						<list type="int">0,1</list>
+					</dynamic> 
+				</value>
+		</property>
+		<property name="result"  mapping="noteMap"/>
+		<property name="order">
+			 <value key="lastUpdateTime" value="-1"/>
+		</property>
+	</select>
+	
+	<!-- 检索星标笔记 -->
+	<select id="getMarkedNote" collection="ln_note">
+		<property name="param" class="java.util.Map">
+				<value column="belong" name="userID"/>
+				<value column="isMarked" type="boolean" value="true"/>
+				<value column="status" type="dynamic" operate="$in">
+					<dynamic>
+						<list type="int">0,1</list>
+					</dynamic> 
+				</value>
+		</property>
+		<property name="result"  mapping="noteMap"/>
+		<property name="order">
+			 <value key="lastUpdateTime"  value="-1"/>
+		</property>
+	</select>
+	
+	<!-- 修改笔记星标 -->
+	<update id="markNote" collection="ln_note">
+		<property name="param" class="java.util.Map">
+			<value column="_id"  name="noteID" type="objectid" />
+			<value column="status" type="int"  value="1" />
+		</property>
+		<property name="action">
+			<value column="isMarked" operate="$set"  type="boolean"   name="isMarked"/>
+			<value column="lastUpdateTime"  name="lastUpdateTime" operate="$set"  type="long"/>
+		</property>
+	</update>
+	
+	<!-- 锁定笔记 -->
+	<update id="lockUserNote" collection="ln_note">
+		<property name="param" class="java.util.Map">
+			<value column="_id"  name="noteID" type="objectid" />
+			<value column="status" type="int"  value="1" />
+		</property>
+		<property name="action">
+			<value column="status"  operate="$set" type="int" value="0"/>
+		</property>
+	</update>
+	
+	<!-- 解锁笔记 -->
+	<update id="unLockUserNote" collection="ln_note">
+		<property name="param" class="java.util.Map">
+			<value column="_id"  name="noteID" type="objectid" />
+		</property>
+		<property name="action">
+			<value column="status"  operate="$set"  value="1" type="int" />
+		</property>
+	</update>
+	
+	<!-- 检索笔记 -->
+	<select id="getNote" collection="ln_note">
+		<property name="param" class="java.util.Map">
+			<value column="_id"    name="noteID"  type="objectid"   value="not exist" />
+		</property>
+		<property name="result"  mapping="noteMap"/>
+	</select>
+	
+	<!-- 添加笔记 -->
+	<insert id="addNote" collection="ln_note">
+		<property name="param"  mapping="noteMap" />
+	</insert>
+	
+	<!-- 笔记版本 -->
+	<select id="getNoteVersion"  collection="ln_note">
+		<property name="param" class="java.lang.String">
+			<value column="_id" name="${value}" type="objectid" />
+		</property>
+		<property name="result" class="java.lang.Long">
+			<value column="version"  value="1"/>
+		</property>
+	</select>
+	
+	<!-- 更新笔记版本号 -->
+	<update id="updateNoteVersion" collection="ln_note">
+		<porperty name="param" class="java.util.Map">
+			<value column="_id"    name="noteID" type="objectid"  />
+		</porperty>
+		<property name="action">
+			<value column="version"  operate="$inc" type="long" value="1"/>
+		</property>
+	</update>
+	
+	<!-- 删除笔记到回收站 -->
+	<update id="deleteNoteRecycle" collection="ln_note">
+		<porperty name="param" class="java.util.Map">
+			<value column="_id"    name="noteID"  type="objectid"   value="not exist" />
+			<value column="belong"    name="userID"   value="" />
+			<value column="version" type="long"   name="clientVersion"   value="" />
+			<value column="status" type="int"  value="1" />
+		</porperty>
+		<property name="action">
+			<value column="status"  operate="$set"  value="2" type="int" />
+			<value column="version" operate="$inc" value="1" type="long" />
+			<value column="lastUpdateTime"  name="lastUpdateTime" operate="$set"  value=""/>
+		</property>
+	</update>
+	
+	<!-- 永久删除笔记 -->
+	<update id="deleteNoteForever" collection="ln_note">
+		<porperty name="param" class="java.util.Map">
+			<value column="_id"    name="noteID"  type="objectid"   value="" />
+			<value column="version"    name="clientVersion" type="long" value="-1" />
+			<!-- 
+			<value column="status" type="int"  value="2" />
+			 -->
+		</porperty>
+		<property name="action">
+			<value column="status" operate="$set"  value="3" type="int" />
+			<value column="version" operate="$inc" value="1" type="long" />
+		</property>
+	</update>
+	
+	<!-- 永久删除笔记-批量 -->
+	<update id="deleteNoteForeverByIDList" collection="ln_note">
+		<porperty name="param" class="java.util.Map">
+			<value column="_id" name="noteIDList" operate="$in" type="objectid" />
+			<value column="belong" name="belong"/>
+		</porperty>
+		<property name="action">
+			<value column="status" operate="$set"  value="3" type="int" />
+			<value column="version" operate="$inc" value="1" type="long" />
+		</property>
+	</update>
+	
+	<!-- 更新笔记 -->
+	<update id="updateNote" collection="ln_note">
+		<porperty name="param" class="java.util.Map">
+			<value column="_id"    name="_id" type="objectid" />
+			<value column="status" type="int"  value="3" operate="$ne" />
+		</porperty>
+		<property name="action">
+			<value column="status"  name="status" operate="$set" />
+			<value column="title"  name="title" operate="$set"  value=""/>
+			<value column="version" operate="$inc"  value="1" type="long" />
+			<value column="createTime"  name="createTime" operate="$set"  value=""/>
+			<value column="lastUpdateTime"  name="lastUpdateTime" operate="$set"  value=""/>
+			<value column="spot"  name="spot" operate="$set"  value=""/>
+			<value column="weather"  name="weather" operate="$set"  value=""/>
+			<value column="categoryID"  name="categoryID" operate="$set"  value=""/>
+			<value column="content"  name="content" operate="$set"  value=""/>
+			<value column="contentFormatTemplate"  name="contentFormatTemplate" operate="$set"  value=""/>
+			<value column="isMarked"  name="isMarked" operate="$set"  value=""/>
+			<value column="remind"  name="remind" operate="$set"  value=""/>
+			<value column="backgroundID"  name="backgroundID" operate="$set"  value=""/>
+			<value column="mood"  name="mood" operate="$set"  value=""/>
+			<value column="accessPassword"  name="accessPassword" operate="$set"  value=""/>
+			<value column="includeType"  name="includeType" operate="$set"  value=""/>
+			<value column="summary"  name="summary" operate="$set"  value=""/>
+			<value column="type"  name="type" operate="$set" type="int" value=""/>
+			<value column="styleType"  name="styleType" operate="$set" type="int" value=""/>
+		</property>
+	</update>
+	
+	<!-- 获取指定分类下的笔记版本列表 -->
+	<select id="getCategoryNoteVersionList" collection="ln_note">
+		<property name="param" class="java.lang.String">
+			<value column="categoryID" name="${value}"/>
+			<value column="status" type="dynamic" operate="$in">
+				<dynamic>
+					<list type="int">0,1</list>
+				</dynamic> 
+			</value>
+		</property>
+		<property name="result" mapping="noteVersionInfo"/>
+		<property name="order">
+			<value key="categoryID" value="-1"/>
+		</property>
+	</select>
+	
+	<!-- 获取回收站的笔记版本列表 -->
+	<select id="getRecycleNoteVersionList" collection="ln_note">
+		<property name="param" class="java.lang.String">
+			<value column="belong" name="${value}"/>
+			<value column="status" type="int" value="2"/><!-- 2状态,回收站笔记 -->
+		</property>
+		<property name="result" mapping="noteVersionInfo"/>
+		<property name="order">
+			<value key="categoryID" value="-1"/>
+		</property>
+	</select>
+	
+	<!-- 更新笔记,分类id,版本号 -->
+	<update id="recoverNote" collection="ln_note">
+		<porperty name="param" class="java.util.Map">
+			<value column="_id"    name="noteID" value="not exist" type="objectid" />
+			<value column="version"    name="clientVersion" type="long" value="-1" />
+			<value column="status" type="int"  value="2" />
+		</porperty>
+		<property name="action">
+			<value column="categoryID" name="categoryID" operate="$set"  value=""/>
+			<value column="version"  operate="$inc"  value="1" type="long" />
+			<value column="status"  operate="$set"  value="1" type="int" />
+			<value column="lastUpdateTime"  name="lastUpdateTime" operate="$set"  value=""/>
+		</property>
+	</update>
+	
+	<!-- 获取指定id笔记版本列表 -->
+	<select id="getNoteVersionByIDList" collection="ln_note">
+		<property name="param" class="java.util.Map">
+			<value column="belong" name="userID"/>
+			<value column="_id" name="noteIDs" operate="$in" type="objectid" />
+		</property>
+		<property name="result" mapping="noteVersionInfo"/>
+		<property name="order">
+			<value key="_id" value="-1"/>
+		</property>
+	</select>
+	
+	<!-- 添加笔记本 -->
+	<insert id="addNoteBook" collection="ln_notebook">
+		<property name="param"  class="java.util.Map">
+			<value column="userID" name="userID"/>
+			<value column="notebook" value="记事本"/>
+			<value column="relateTableName" value="ln_note"/>
+		</property>
+	</insert>
+	
+	<delete id="deleteNoteTagByNoteID" collection="ln_tagnoterelation">
+		<property name="param" class="java.util.Map">
+			<value column="noteID"    name="noteID"   value="not exist" />
+			<value column="belong"    name="userID"   value="not exist" />
+			<value column="tagID" name="tagIDList" operate="$in" />
+		</property>
+	</delete>
+	
+	<update id="updateResourceByID" collection="ln_resource">
+		<porperty name="param" class="java.util.Map">
+			<value column="_id"    name="resourceID" value="not exist" type="objectid"  />
+			<value column="belong"    name="belong" value="not exist" />
+		</porperty>
+		<property name="action">
+			<value column="name" name="name" operate="$set"  value=""/>
+			<value column="type" name="type" operate="$set"  value=""/>
+			<value column="link" name="link" operate="$set"  value=""/>
+			<value column="lastUpdateTime" name="lastUpdateTime" operate="$set"  value=""/>
+			<value column="createTime" name="createTime" operate="$set"  value=""/>
+			<value column="description" name="description" operate="$set"  value=""/>
+			<value column="size" name="size" operate="$set" type="float"  value=""/>
+			<value column="version"  operate="$inc"  value="1" type="long" />
+		</property>
+	</update>
+		
+	<!-- 检索回收站笔记列表 -->
+	<select id="getRecycleNoteList" collection="ln_note">
+		<property name="param" class="java.util.Map">
+				<value column="belong" name="userID"  value=""/>
+				<value column="status" type="int"  value="2"/>
+		</property>
+		<property name="result"  mapping="noteMap"/>
+		<property name="order">
+			 <value key="lastUpdateTime"  value="-1"/>
+		</property>
+	</select>
+	
+	<!-- 获取指定id笔记列表 -->
+	<select id="getNoteListByIDList" collection="ln_note">
+		<property name="param" class="java.util.Map">
+			<value column="_id" name="noteIDs" operate="$in" type="objectid"  />
+			<value column="status" type="dynamic" operate="$in">
+				<dynamic>
+					<list type="int">0,1</list>
+				</dynamic> 
+			</value>
+		</property>
+		<property name="result" mapping="noteMap"/>
+	</select>
+	
+	<!-- 获取指定id笔记列表 -->
+	<select id="getNoteListByIDListIgnoreStatus" collection="ln_note">
+		<property name="param" class="java.util.Map">
+			<value column="_id" name="noteIDs" operate="$in" type="objectid"  />
+		</property>
+		<property name="result" mapping="noteMap"/>
+	</select>
+	
+	
+	<!-- 获取指定id笔记列表 -->
+	<select id="getAllStatusNoteListByIDList" collection="ln_note">
+		<property name="param" class="java.util.Map">
+			<value column="_id" name="noteIDs" operate="$in" type="objectid"  />
+		</property>
+		<property name="result" mapping="noteMap"/>
+		<property name="order">
+			<value key="_id" value="-1"/>
+		</property>
+	</select>
+	
+	<!-- 分享笔记查询 -->
+	<select id="getShareNote" collection="ln_note">
+		<property name="param" class="java.util.Map">
+			<value column="_id"    name="noteID"  type="objectid"   value="not exist" />
+		</property>
+		<property name="result" mapping="shareNoteInfo"/>
+		<property name="order">
+			 <value key="_id"  value="1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="10"/>
+	</select>
+	
+	<!-- 获取监控的随机(最新)笔记列表 -->
+	<select id="getMonitorRandomNoteList" collection="ln_note">
+		<property name="param" class="java.util.Map">
+			<value column="status" type="dynamic" operate="$in">
+				<dynamic>
+					<list type="int">0,1</list>
+				</dynamic> 
+			</value>
+		</property>
+		<property name="result" mapping="noteMap"/>
+		<property name="order">
+			<value key="_id" value="-1"/>
+		</property>
+	</select>
+
+	<!-- 用户可用笔记数 0,1状态 -->	
+	<select id="getUsableNoteCount" collection="ln_note">
+		<property name="param" class="java.lang.String">
+				<value column="belong" name="${value}"/>
+				<value column="status" type="dynamic" operate="$in">
+					<dynamic>
+						<list type="int">0,1</list>
+					</dynamic> 
+				</value>
+		</property>
+		<property name="result" class="java.lang.String">
+			<value column="_id"  value="1"/>
+		</property>
+	</select>
+
+	<!-- 用户可用笔记数 0,1状态 -->	
+	<select id="getUsableNoteCountByCategoryID" collection="ln_note">
+		<property name="param" class="java.util.Map">
+				<value column="categoryID" name="cateIDs" operate="$in" />
+				<value column="status" type="dynamic" operate="$in">
+					<dynamic>
+						<list type="int">0,1</list>
+					</dynamic> 
+				</value>
+		</property>
+		<property name="result" class="java.lang.String">
+			<value column="_id"  value="1"/>
+		</property>
+	</select>
+
+	<!-- 用户星标笔记数 0,1状态 + isMarked=true -->	
+	<select id="getMarkedNoteCount" collection="ln_note">
+		<property name="param" class="java.lang.String">
+				<value column="belong" name="${value}"/>
+				<value column="isMarked" type="boolean" value="true"/>
+				<value column="status" type="dynamic" operate="$in">
+					<dynamic>
+						<list type="int">0,1</list>
+					</dynamic> 
+				</value>
+		</property>
+		<property name="result" class="java.lang.String">
+			<value column="_id"  value="1"/>
+		</property>
+	</select>
+
+	<!-- 用户星标笔记数 0,1状态 + isMarked=true -->	
+	<select id="getMarkedNoteCountByCategoryID" collection="ln_note">
+		<property name="param" class="java.util.Map">
+				<value column="categoryID" name="cateIDs" operate="$in" />
+				<value column="isMarked" type="boolean" value="true"/>
+				<value column="status" type="dynamic" operate="$in">
+					<dynamic>
+						<list type="int">0,1</list>
+					</dynamic> 
+				</value>
+		</property>
+		<property name="result" class="java.lang.String">
+			<value column="_id"  value="1"/>
+		</property>
+	</select>
+
+	<!-- 用户回收站笔记数 2状态 -->	
+	<select id="getRecycleNoteCount" collection="ln_note">
+		<property name="param" class="java.lang.String">
+				<value column="belong" name="${value}"/>
+				<value column="status" type="int" value="2" />
+		</property>
+		<property name="result" class="java.lang.String">
+			<value column="_id"  value="1"/>
+		</property>
+	</select>
+
+	<!-- 用户分享的笔记数 ln_note.type in (2,3) -->	
+	<select id="getSharedNoteCount" collection="ln_note">
+		<property name="param" class="java.lang.String">
+				<value column="belong" name="${value}"/>
+				<value column="type" type="dynamic" operate="$in">
+					<dynamic>
+						<list type="int">2,3</list>
+					</dynamic> 
+				</value>
+				<value column="status" type="dynamic" operate="$in">
+					<dynamic>
+						<list type="int">0,1</list>
+					</dynamic> 
+				</value>
+		</property>
+		<property name="result" class="java.lang.String">
+			<value column="_id"  value="1"/>
+		</property>
+	</select>
+
+	<!-- 用户分享的笔记数 ln_note.type in (2,3) -->	
+	<select id="getSharedNoteCountByCategoryID" collection="ln_note">
+		<property name="param" class="java.util.Map">
+				<value column="categoryID" name="cateIDs" operate="$in" />
+				<value column="type" type="dynamic" operate="$in">
+					<dynamic>
+						<list type="int">2,3</list>
+					</dynamic> 
+				</value>
+				<value column="status" type="dynamic" operate="$in">
+					<dynamic>
+						<list type="int">0,1</list>
+					</dynamic> 
+				</value>
+		</property>
+		<property name="result" class="java.lang.String">
+			<value column="_id"  value="1"/>
+		</property>
+	</select>
+	
+	<!-- 更新笔记type -->
+	<update id="updateNoteType" collection="ln_note">
+		<porperty name="param" class="java.util.Map">
+			<value column="_id"    name="noteID" value="not exist" type="objectid"  />
+		</porperty>
+		<property name="action">
+			<value column="type" name="type" operate="$set" type="int" value=""/>
+		</property>
+	</update>
+</sqls>

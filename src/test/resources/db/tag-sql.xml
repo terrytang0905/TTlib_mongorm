@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 标签 (用户标签、笔记标签) -->
+<sqls>
+	<mapping id="tagInfo" class="com.lenovo.supernote.model.note.Tag">
+		<property column="_id"  name="id"/>
+		<property column="name"  name="name"/>
+		<property column="type"  name="type"/>
+		<property column="tagIcon"  name="tagIcon"/>
+		<property column="creator"  name="creator"/>
+		<property column="createTime"  name="createTime"/>
+		<property column="hash"  name="hash"/>
+		<property column="dataSource" name="dataSource" type="int"  value=""/>
+		<property column="dataSourceKey" name="creator"  value=""/>
+	</mapping>
+	
+	<mapping id="relationInfo" class="com.lenovo.supernote.model.note.TagNoteRelation">
+		<property column="tagID"  name="tagID"/>
+		<property column="belong"  name="belong"/>
+		<property column="noteID"  name="noteID"/>
+	</mapping>
+	
+	<!-- ln_tagnoterelation表 -->
+	<mapping id="noteTag" class="java.util.Map">
+		<property column="belong"  name="userID"/>
+		<property column="noteID"  name="noteID"/>
+		<property column="tagID"  name="tagID"/>
+	</mapping>
+	
+	<!-- 根据标签查标签ID -->
+	<select id="getTagID" collection="ln_tag">
+		<property name="param" class="java.util.Map">
+				<value column="_id"  type="objectid" name="tagID"/>
+				<value column="name" name="tagName"/>
+		</property>
+		<property name="result"  class="java.lang.String">
+				<value column="_id" value="1"/>
+		</property>
+	</select>
+	
+	<!-- 添加标签 -->
+	<insert id="addTag" collection="ln_tag">
+		<property name="param"  mapping="tagInfo" />
+	</insert>
+	
+	<!-- 删除标签 -->
+	<delete id="delTag" collection="ln_tag">
+		<property name="param" class="java.util.Map">
+				<value column="_id"  type="objectid" name="tagID"/>
+		</property>
+	</delete>
+	
+	<!-- 添加用户标签 -->
+	<insert id="addNoteTag" collection="ln_tagnoterelation">
+		<property name="param" class="java.util.Map"> 
+			<value column="tagID"  name="tagID"/>
+			<value column="noteID"  name="noteID"/>
+			<value column="belong"  name="userID"/>
+		</property>
+	</insert>
+	
+	<!-- 删除用户标签 -->
+	<delete id="delNoteTag" collection="ln_tagnoterelation">
+		<property name="param" class="java.util.Map">
+			<value column="belong"  name="userID"/>
+			<value column="noteID"  name="noteID"/>
+			<value column="tagID"  name="tagID"/>
+		</property>
+	</delete>
+	
+	<!-- 删除用户标签 -->
+	<delete id="delNoteTagByTagID" collection="ln_tagnoterelation">
+		<property name="param" class="java.lang.String">
+			<value column="tagID" />
+		</property>
+	</delete>
+	
+	<!-- 查询笔记标签 -->
+	<select id="getNoteTag" collection="ln_tagnoterelation">
+		<property name="param" class="java.lang.String">
+				<value column="noteID" name="${value}" value="not exist"/>
+		</property>
+		<property name="result"  class="java.lang.String">
+				<value column="tagID" value="1"/>
+		</property>
+	</select>
+	
+	<!-- 查询笔记标签 -->
+	<select id="getNoteTagByNoteIDList" collection="ln_tagnoterelation">
+		<property name="param" class="java.util.Map">
+				<value column="noteID" name="noteIDList" operate="$in"/>
+		</property>
+		<property name="result"   mapping="relationInfo" />
+	</select>
+	
+	<!-- 查询笔记标签 -->
+	<select id="getUserTag" collection="ln_tag">
+		<property name="param" class="java.lang.String">
+				<value column="creator" name="${value}" value="not exist"/>
+		</property>
+		<property name="result"   mapping="tagInfo" />
+	</select>
+	
+	<!-- 查询用户标签下的笔记ID -->
+	<select id="getTagNoteIDList" collection="ln_tagnoterelation">
+		<property name="param" class="java.util.Map">
+				<value column="tagID" name="tagID" value="not exist"/>
+				<value column="belong" name="userID" value="not exist"/>
+		</property>
+		<property name="result"  class="java.lang.String">
+				<value column="noteID" value="1"/>
+		</property>
+	</select>
+	
+	<!-- 查询用户标签下的笔记 -->
+	<select id="getTagNoteRelation" collection="ln_tagnoterelation">
+		<property name="param" class="java.util.Map">
+				<value column="belong" name="userID" value="not exist"/>
+		</property>
+		<property name="result"   mapping="noteTag" />
+	</select>
+	
+	<select id="getTagNoteRelationByNoteIDList" collection="ln_tagnoterelation">
+		<property name="param" class="java.util.Map">
+			<value column="belong" name="userID" value="not exist"/>
+			<value column="noteID" name="noteIDs" operate="$in" />
+		</property>
+		<property name="result"  class="java.lang.String">
+				<value column="tagID" value="1"/>
+		</property>
+	</select>
+	
+	<!-- 查询笔记信息 -->
+	<select id="getTagByID" collection="ln_tag">
+		<property name="param" class="java.util.Map">
+				<value column="_id"  type="objectid" name="tagID"/>
+		</property>
+		<property name="result"   mapping="tagInfo" />
+		<property name="order">
+			 <value key="_id"  value="1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="0"/>
+	</select>
+	
+	<!-- 查询标签信息 -->
+	<select id="getTagIDByHash" collection="ln_tag">
+		<property name="param" class="java.lang.Integer">
+				<value column="hash" type="int" name="${value}" value="not exist" />
+		</property>
+		<property name="result"  class="java.lang.String">
+				<value column="_id" value="1"/>
+		</property>
+		<property name="order">
+			 <value key="_id"  value="1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="10"/>
+	</select>
+	
+	<!-- 查询笔记信息 -->
+	<select id="getTagByIDList" collection="ln_tag">
+		<property name="param" class="java.util.Map">
+			<value column="_id" name="noteTagIDs"  type="objectid" operate="$in" />
+		</property>
+		<property name="result"   mapping="tagInfo" />
+		<property name="order">
+			 <value key="_id"  value="1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="1000"/>
+	</select>
+	
+	<!-- 根据hash检索tag -->
+	<select id="getTagCountByHash" collection="ln_tag">
+		<property name="param" class="java.lang.Integer">
+			<value column="hash" type="int" name="${value}" value="-1" />
+		</property>
+		<property name="result" mapping="tagInfo"/>
+		<property name="order">
+				<value key="_id"  value="-1"/>
+		</property>
+	</select>
+</sqls>

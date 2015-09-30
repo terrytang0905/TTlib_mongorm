@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-3.2.xsd
+    http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+    http://www.springframework.org/schema/tx 
+    http://www.springframework.org/schema/tx/spring-tx-3.2.xsd 
+    http://www.springframework.org/schema/aop 
+    http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+    http://www.springframework.org/schema/task 
+    http://www.springframework.org/schema/task/spring-task-3.2.xsd
+    ">
+
+	<!-- 属性文件的配置 -->
+	<bean id="propertiesConfig"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:config/memcached.properties</value>
+				<value>classpath:config/system.properties</value>
+				<value>classpath:config/mongodb.properties</value>
+				<value>classpath:config/jms.properties</value>
+				<value>classpath:config/client-version.properties</value>
+			</list>
+		</property>
+	</bean>
+
+
+	<!-- mongodb.properties -->
+	<bean id="mongoManager" class="com.lenovo.supernote.orm.db.client.mongo.MongoManager">
+		<constructor-arg name="nodeiplist" value="${product.mongo.db.nodeiplist}" />
+		<constructor-arg name="nodeportlist"
+			value="${product.mongo.db.nodeportlist}" />
+		<constructor-arg name="dbName" value="${product.mongo.db.dbname}" />
+		<constructor-arg name="userName" value="${product.mongo.db.username}" />
+		<constructor-arg name="passWord" value="${product.mongo.db.password}" />
+		<constructor-arg name="connectionsPerHost"
+			value="${product.mongo.db.connectionsperhost}" />
+		<constructor-arg name="threadsAllowedToBlock"
+			value="${product.mongo.db.threadsallowedtoblock}" />
+		<constructor-arg name="connectionTimeOut"
+			value="${product.mongo.db.connectiontimeout}" />
+		<constructor-arg name="maxRetryTime"
+			value="${product.mongo.db.maxretrytime}" />
+		<constructor-arg name="socketTimeOut"
+			value="${product.mongo.db.sockettimeout}" />
+	</bean>
+
+	<bean id="noteSyncDBTest" class="com.lenovo.supernote.mongo.NoteSyncDBTest">
+		<property name="mongoManager" ref="mongoManager" />
+	</bean>
+
+	<!-- 使Spring注解 -->
+	<context:annotation-config />
+	<!-- 让Spring通过自动扫描来查询和管理Bean -->
+	<context:component-scan base-package="com.lenovo.supernote" />
+</beans>

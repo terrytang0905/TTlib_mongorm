@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 资源 -->
+<sqls>
+	<mapping id="attacheInfo" class="com.lenovo.supernote.model.note.Resource">
+		<property column="_id"  name="resourceID"/>
+		<property column="name"  name="name"/>
+		<property column="type"  name="type"/>
+		<property column="link"  name="link"/>
+		<property column="version"  name="version"/>
+		<property column="description"  name="description"/>
+		<property column="belong"  name="belong"/>
+		<property column="noteID"  name="noteID"/>
+		<property column="size"  name="size"/>
+		<property column="keyID"  name="keyID"/>
+		<property column="publicLink"  name="publicLink"/>
+		<property column="startTime"  name="startTime"/>
+		<property column="fullTime"  name="fullTime"/>
+		<property column="uploadTime"  name="uploadTime"/>
+		<property column="parentLocalID"  name="parentLocalID"/>
+		<property column="mixLocalID"  name="mixLocalID"/>
+		<property column="status"  name="status"/>
+		<property column="genID"  name="local_id"/>
+		<property column="genTime"  name="genTime"/>
+		<property column="dataSource" name="dataSource" type="int"  value=""/>
+		<property column="dataSourceKey" name="belong"  value=""/>
+	</mapping>
+	
+	<!-- 使用空间规则 -->
+	<mapping id="capacityRule" class="com.lenovo.supernote.service.capacity.CapacityRule">
+		<property column="type"  name="userGrade"/>
+		<property column="totalSpace"  name="total"/>
+		<property column="singleSpace"  name="single"/>
+		<property column="totalSum"  name="sum"/>
+	</mapping>
+	
+	<!-- 根据笔记ID获取资源列表 -->
+	<select id="getNoteResourceList" collection="ln_resource">
+		<property name="param" class="java.lang.String">
+				<value column="noteID" name="${value}"/>
+				<value column="status" value="1" type="int" />
+		</property>
+		<property name="result"  mapping="attacheInfo"/>
+	</select>
+	
+	<!-- 根据笔记ID获取资源列表 -->
+	<select id="getNoteResourceListByNoteIDList" collection="ln_resource">
+		<property name="param" class="java.util.Map">
+			<value column="noteID" name="noteIDList" operate="$in" />
+			<value column="status" value="1" type="int" />
+		</property>
+		<property name="result"  mapping="attacheInfo"/>
+	</select>
+	
+	<!-- 获取分享笔记资源列表 -->
+	<select id="getShareNoteResourceList" collection="ln_resource">
+		<property name="param" class="java.lang.String">
+			<value column="noteID" name="${value}" operate="$in" value="not exit"/>
+	    	<value column="status" type="int" value="1"/>
+		</property>
+		<property name="result"  class="com.lenovo.supernote.model.note.Resource">
+			<value column="name"  name="name"/>
+			<value column="keyID" name="keyID"/>
+			<value column="type"  name="type"/>
+			<value column="link"  name="link"/>
+			<value column="publicLink"  name="publicLink"/>
+			<value column="description"  name="description"/>
+			<value column="size"  name="size"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="1000"/>
+	</select>
+	
+	<!-- 根据附件keyID取资源信息 -->
+	<select id="getResourceByKeyID" collection="ln_resource">
+		<property name="param" class="java.lang.String">
+			<value column="keyID" name="keyID" value="not exists"/>
+		</property>
+		<property name="result"  mapping="attacheInfo" />
+	</select>
+	
+	<!-- 根据附件genID取资源信息 -->
+	<select id="getResourceByGenID" collection="ln_resource">
+		<property name="param" class="java.lang.String">
+			<value column="genID" name="genID" value="not exists"/>
+		</property>
+		<property name="result"  mapping="attacheInfo" />
+	</select>
+	
+	<!-- 根据附件ID取资源信息 -->
+	<select id="getResourceByID" collection="ln_resource">
+		<property name="param" class="java.lang.String">
+			<value column="_id" name="${value}"  type="objectid" value="not exists" />
+		</property>
+		<property name="result"  mapping="attacheInfo" />
+	</select>
+	
+	<!-- 添加资源信息 -->
+	<insert id="addResource" collection="ln_resource">
+		<property name="param"  mapping="attacheInfo" />
+	</insert>
+	
+	<!-- 资源版本 -->
+	<select id="getResourceVersion"  collection="ln_resource">
+		<property name="param" class="java.lang.String">
+			<value column="_id" name="${value}" type="objectid" value="not exists" />
+		</property>
+		<property name="result" class="java.lang.Long">
+			<value column="version"  value="1"/>
+		</property>
+		<property name="order">
+				<value key="version"  value="1"/>
+		</property>
+	</select>
+	
+	<!-- 笔记资源id列表 -->
+	<select id="getNoteResourceID"  collection="ln_resource">
+		<property name="param" class="java.lang.String">
+			<value column="noteID" name="${value}"/>
+		</property>
+		<property name="result" class="java.lang.String">
+			<value column="_id"  value="1"/>
+		</property>
+	</select>
+	
+	<update id="updateResource" collection="ln_resource">
+		<porperty name="param" class="java.util.Map">
+			<value column="_id"    name="resourceID" type="objectid" value="not exists" />
+			<!-- <value column="version"    name="clientVersion" type="long" value="-1" /> TODO 临时:不校验资源版本 -->
+			<value column="belong"    name="belong" value="not exists" />
+		</porperty>
+		<property name="action">
+			<value column="name"  name="name" operate="$set"  value=""/>
+			<value column="type"  name="type" operate="$set"  type="int" value=""/>
+			<value column="link"  name="link" operate="$set"  value=""/>
+			<value column="publicLink"  name="publicLink" operate="$set"  value=""/>
+			<value column="fullTime"  name="fullTime" operate="$set"  type="int" value=""/>
+			<value column="startTime"  name="startTime" operate="$set"  type="int" value=""/>
+			<value column="description"  name="description" operate="$set"  value=""/>
+			<value column="size"  name="size" operate="$set"  type="long" value=""/>
+			<value column="parentID"  name="parentID" operate="$set"  value=""/>
+			<value column="uploadTime"  name="uploadTime" type="long" operate="$set"  value=""/>
+			<value column="version" operate="$inc" type="long" value="1" />
+		</property>
+	</update>
+	
+	<update id="updateResourceByKeyID" collection="ln_resource">
+		<property name="param" class="java.lang.String">
+			<value column="keyID" name="keyID" value="not exists"/>
+		</property>
+		<property name="action">
+			<value column="name"  name="name" operate="$set"  value=""/>
+			<value column="type"  name="type" operate="$set"  type="int" value=""/>
+			<value column="link"  name="link" operate="$set"  value=""/>
+			<value column="publicLink"  name="publicLink" operate="$set"  value=""/>
+			<value column="fullTime"  name="fullTime" operate="$set"  type="int" value=""/>
+			<value column="startTime"  name="startTime" operate="$set"  type="int" value=""/>
+			<value column="description"  name="description" operate="$set"  value=""/>
+			<value column="size"  name="size" operate="$set"  type="long" value=""/>
+			<value column="parentID"  name="parentID" operate="$set"  value=""/>
+			<value column="uploadTime"  name="uploadTime" type="long" operate="$set"  value=""/>
+			<value column="version" operate="$inc" type="long" value="1" />
+		</property>
+	</update>
+	
+	<delete id="deleteResourceByIDList" collection="ln_resource">
+		<property name="param" class="java.util.Map">
+			<value column="_id" name="resourceIDList"  type="objectid" operate="$in" />
+		</property>
+	</delete>
+	
+	<!-- 删除ln_note.attachment中包含的要删除的资源id -->
+	<update id="pullResourceFromNote" collection="ln_note">
+		<porperty name="param" class="java.util.Map">
+			<value column="_id"    name="noteID"  type="objectid"  value="not exists" />
+		</porperty>
+		<property name="action">
+			<value column="attachment"  operate="$pull" >
+				<value column="resourceID" operate="$in" name="resourceIDList" />
+			</value>
+		</property>
+	</update>
+	
+	<!-- 删除ln_note.attachment中包含的要删除的资源id -->
+	<update id="pushAllResourceFromNote" collection="ln_note">
+		<porperty name="param" class="java.util.Map">
+			<value column="_id"  name="noteID"   type="objectid"  value="not exists" />
+		</porperty>
+		<property name="action">
+			<value column="attachment" name="resourceList" operate="$pushAll" />
+		</property>
+	</update>
+	
+	<!-- 获取容量规则列表 -->
+	<select id="getCapacityRuleList" collection="ln_userspacerule">
+	    <property name="param">
+	    	<value column="status" type="int" value="0"/>
+	    </property>
+		<property name="result"  mapping="capacityRule"/>
+		<property name="skip" value="0"/>
+		<property name="limit" value="1000"/>
+	</select>
+	
+	<!-- 校验genID是否存在 -->
+	<select id="getExistGenIDList" collection="ln_resource">
+		<property name="param" class="java.util.Map">
+			<value column="genID" name="genIDList" operate="$in"  />
+		</property>		
+		<property name="result" class="java.lang.String">
+			<value column="genID"  value="1"/>
+		</property>
+		<property name="order">
+			<value key="_id" value="-1"/>
+		</property>
+		<property name="skip" value="0"/>
+		<property name="limit" value="0"/>
+	</select>
+	
+	<!-- 更新资源附件公共链接 -->
+	<update id="updateResourcePublicLink" collection="ln_resource">
+		<porperty name="param" class="java.util.Map">
+			<value column="keyID" name="key" operate="$in" value="-1" />
+		</porperty>
+		<property name="action">
+			<value column="publicLink"  name="public_link" operate="$set"  value="null"/>
+		</property>
+	</update>
+	
+	<select id="getResourceByNoteIDList"  collection="ln_resource">
+		<property name="param" class="java.util.Map">
+			<value column="noteID" name="noteIDList" operate="$in" />
+			<value column="belong" name="belong"/>
+		</property>
+		<property name="result"  mapping="attacheInfo"/>
+	</select>
+</sqls>
