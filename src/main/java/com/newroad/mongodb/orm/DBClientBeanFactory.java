@@ -7,7 +7,7 @@ import org.springframework.core.io.Resource;
 import com.newroad.mongodb.orm.db.client.DBCRUDClient;
 
 /**
- * Mongo客户端服务工厂
+ * Mongo Client Bean Factory
  */
 public class DBClientBeanFactory {
 	/**

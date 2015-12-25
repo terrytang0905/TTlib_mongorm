@@ -1,19 +1,19 @@
 package com.newroad.mongodb.orm.db.client.mongo;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mongodb.DB;
-import com.mongodb.Mongo;
+import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoDatabase;
 import com.newroad.mongodb.orm.exception.MongoDaoException;
 import com.newroad.mongodb.orm.transaction.TransactionManager;
 
@@ -41,7 +41,7 @@ public class MongoManager implements TransactionManager {
   private Integer socketTimeOut = 60 * 1000;
   private List<ServerAddress> serverAddressList;
 
-  private Mongo mongoClient;
+  private MongoClient mongoClient;
 
   private MongoManager() {
   }
@@ -70,9 +70,6 @@ public class MongoManager implements TransactionManager {
       } catch (NumberFormatException e) {
         // TODO Auto-generated catch block
         log.error("MongoManager NumberFormatException:" + e);
-      } catch (UnknownHostException e) {
-        // TODO Auto-generated catch block
-        log.error("MongoManager UnknownHostException:" + e);
       }
       mongoInit();
     }
@@ -90,9 +87,9 @@ public class MongoManager implements TransactionManager {
     MongoClientOptions.Builder builder =
         MongoClientOptions.builder().connectionsPerHost(connectionsPerHost)
             .threadsAllowedToBlockForConnectionMultiplier(threadsAllowedToBlock)
-            .connectTimeout(connectionTimeOut).socketTimeout(socketTimeOut).autoConnectRetry(true);
+            .connectTimeout(connectionTimeOut).socketTimeout(socketTimeOut);
     if (maxRetryTime > 0) {
-      builder.maxAutoConnectRetryTime(maxRetryTime);
+      builder.maxConnectionIdleTime(maxRetryTime);
     }
 
     int nodes = serverAddressList.size();
@@ -108,22 +105,19 @@ public class MongoManager implements TransactionManager {
       mongoClient = new MongoClient(serverAddressList, Arrays.asList(credential), builder.build());
     }
 
-    DB dbpool = mongoClient.getDB(dbName);
-    if (!dbpool.authenticate(userName, passWord.toCharArray())) {
-      log.error("Authentication failure!userName:" + userName + ",dbName:" + dbName + ",passWord:"
-          + passWord);
-      throw new MongoDaoException("DB Connection failed because of authentication failure!");
-    }
+
+    MongoDatabase mongoDB = mongoClient.getDatabase(dbName);
+    
   }
 
-  private ThreadLocal<DB> local = new ThreadLocal<DB>();
+  private ThreadLocal<MongoDatabase> local = new ThreadLocal<MongoDatabase>();
 
-  public DB getDB() {
-    DB db = local.get();
+  public MongoDatabase getDB() {
+    MongoDatabase db = local.get();
     if (db != null) {
       return db;
     }
-    return mongoClient.getDB(dbName);
+    return mongoClient.getDatabase(dbName);
   }
 
   public void closeDB() {
@@ -134,10 +128,11 @@ public class MongoManager implements TransactionManager {
 
   @Override
   public void openTransaction() {
-    DB db = mongoClient.getDB(dbName);
+    MongoDatabase db = mongoClient.getDatabase(dbName);
     local.set(db);
     // Set new PinnedRequestStatus Object into ThreadLocal
-    local.get().requestStart();
+    Bson bs=new BasicDBObject("requestStart",1);
+	local.get().runCommand(bs);
   }
 
   @Override
@@ -153,7 +148,8 @@ public class MongoManager implements TransactionManager {
   @Override
   public void closeTransaction() {
     // Remove the specific PinnedRequestStatus Object from ThreadLocal in order to keep thread safe
-    local.get().requestDone();
+	Bson bs=new BasicDBObject("requestDone",1);
+	local.get().runCommand(bs);
     local.remove();
   }
 
