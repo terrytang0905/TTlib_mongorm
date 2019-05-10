@@ -9,7 +9,7 @@
 	<description>the orm for mongodb</description>
 
 	<properties>
-		<project.spring.version>4.1.6.RELEASE</project.spring.version>
+		<project.spring.version>4.3.17.RELEASE</project.spring.version>
 		<project.httpcomponents.version>4.2.2</project.httpcomponents.version>
 		<project.newroad.group>com.newroad</project.newroad.group>
 		<project.newroad.version>0.0.1.RELEASE</project.newroad.version>
@@ -97,7 +97,7 @@
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
-					<encoding>${project.build.sourceEncoding}</encoding>
+					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
 			<plugin>
